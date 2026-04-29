@@ -1,6 +1,6 @@
 # MyKhataApp Backend
 
-A comprehensive Node.js/Express backend API for the MyKhataApp - a modern finance and Khata management system.
+A modern Next.js backend API for the MyKhataApp - a comprehensive finance and Khata management system.
 
 ## 📋 Table of Contents
 
