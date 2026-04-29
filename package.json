@@ -22,11 +22,13 @@
     "next": "^14.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "mongoose": "^7.0.0",
+    "prisma": "^5.0.0",
+    "@prisma/client": "^5.0.0",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.0",
-    "validator": "^13.9.0",
-    "cors": "^2.8.5",
+    "next-cors": "^0.0.11",
+    "cloudinary": "^1.40.0",
+    "next-cloudinary": "^4.0.0",
     "dotenv": "^16.0.3"
   },
   "devDependencies": {
