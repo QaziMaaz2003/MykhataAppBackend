@@ -1,0 +1,17 @@
+import express from 'express';
+
+const router = express.Router();
+
+/**
+ * Health check endpoint
+ * GET /api/health
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+  });
+});
+
+export default router;
