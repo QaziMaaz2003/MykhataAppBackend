@@ -3,8 +3,7 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/api/entries/i-am-owed-money": "pages/api/entries/i-am-owed-money.js",
-  "/api/entries/i-am-owed-money/[id]": "pages/api/entries/i-am-owed-money/[id].js",
-  "/api/delete-image": "pages/api/delete-image.js",
-  "/api/profile": "pages/api/profile.js",
-  "/api/entries/i-owe-money": "pages/api/entries/i-owe-money.js"
+  "/api/entries/i-owe-money": "pages/api/entries/i-owe-money.js",
+  "/api/auth/login": "pages/api/auth/login.js",
+  "/api/entries/i-am-owed-money/[id]": "pages/api/entries/i-am-owed-money/[id].js"
 }

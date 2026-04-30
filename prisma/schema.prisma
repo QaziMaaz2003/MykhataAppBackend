@@ -24,8 +24,25 @@ model User {
 
   iOweMoney     IOweMoney[]
   iAmOwedMoney  IAmOwedMoney[]
+  otps          OTP[]
 
   @@map("users")
+}
+
+model OTP {
+  id            String     @id @default(cuid())
+  email         String
+  otp           String
+  type          String     @default("email_verification") // email_verification, password_reset
+  isUsed        Boolean    @default(false)
+  userId        String?
+  user          User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt     DateTime
+  createdAt     DateTime   @default(now())
+
+  @@index([email])
+  @@index([userId])
+  @@map("otps")
 }
 
 model IOweMoney {

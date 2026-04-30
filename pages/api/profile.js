@@ -4,6 +4,17 @@ import { withCORS } from '../../lib/middleware/cors';
 import { withAuth } from '../../lib/middleware/auth';
 import bcryptjs from 'bcryptjs';
 
+const validatePasswordStrength = (password) => {
+  if (password.length < 8) return 'Password must be at least 8 characters';
+  if (!/[A-Z]/.test(password)) return 'Password must contain at least one uppercase letter';
+  if (!/[a-z]/.test(password)) return 'Password must contain at least one lowercase letter';
+  if (!/\d/.test(password)) return 'Password must contain at least one number';
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    return 'Password must contain at least one special character';
+  }
+  return null;
+};
+
 async function handler(req, res) {
   if (req.method === 'GET') {
     return handleGetProfile(req, res);
@@ -92,8 +103,10 @@ async function handleChangePassword(req, res) {
       return sendError(res, 400, 'Old password, new password, and confirmation are required');
     }
 
-    if (newPassword.length < 6) {
-      return sendError(res, 400, 'New password must be at least 6 characters');
+    // Validate password strength
+    const passwordError = validatePasswordStrength(newPassword);
+    if (passwordError) {
+      return sendError(res, 400, passwordError);
     }
 
     if (newPassword !== confirmPassword) {
