@@ -33,13 +33,21 @@ async function handleGetEntries(req, res) {
       },
     });
 
-    // Calculate totalPaid and remaining for each entry
+    // Calculate totalPaid, totalAdditionalDebt and remaining for each entry
     const entriesWithCalculations = entries.map((entry) => {
-      const totalPaid = entry.payments.reduce((sum, payment) => sum + payment.amount, 0);
-      const remaining = entry.amount - totalPaid;
+      const totalPaid = entry.payments
+        .filter(p => p.type === 'payment')
+        .reduce((sum, payment) => sum + payment.amount, 0);
+      
+      const totalAdditionalDebt = entry.payments
+        .filter(p => p.type === 'additional_debt')
+        .reduce((sum, payment) => sum + payment.amount, 0);
+      
+      const remaining = entry.amount + totalAdditionalDebt - totalPaid;
       return {
         ...entry,
         totalPaid,
+        totalAdditionalDebt,
         remaining,
       };
     });

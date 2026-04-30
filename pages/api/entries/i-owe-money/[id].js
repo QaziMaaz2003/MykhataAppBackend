@@ -44,13 +44,21 @@ async function handleGetEntry(req, res, id) {
       return sendError(res, 403, 'Not authorized to view this entry');
     }
 
-    // Calculate totalPaid and remaining
-    const totalPaid = entry.payments.reduce((sum, payment) => sum + payment.amount, 0);
-    const remaining = entry.amount - totalPaid;
+    // Calculate totalPaid, totalAdditionalDebt and remaining
+    const totalPaid = entry.payments
+      .filter(p => p.type === 'payment')
+      .reduce((sum, payment) => sum + payment.amount, 0);
+    
+    const totalAdditionalDebt = entry.payments
+      .filter(p => p.type === 'additional_debt')
+      .reduce((sum, payment) => sum + payment.amount, 0);
+    
+    const remaining = entry.amount + totalAdditionalDebt - totalPaid;
 
     return sendResponse(res, 200, true, 'Entry retrieved', {
       ...entry,
       totalPaid,
+      totalAdditionalDebt,
       remaining,
     });
   } catch (error) {
@@ -151,17 +159,23 @@ async function handleRecordPayment(req, res, id) {
       return sendError(res, 403, 'Not authorized to record payment for this entry');
     }
 
-    const { amount, date, description } = req.body;
+    const { amount, date, description, type = 'payment' } = req.body;
 
     if (!amount || amount <= 0) {
       return sendError(res, 400, 'Payment amount must be a positive number');
     }
 
+    // Validate type
+    if (!['payment', 'additional_debt'].includes(type)) {
+      return sendError(res, 400, 'Type must be "payment" or "additional_debt"');
+    }
+
     // Create a new payment record
     const payment = await prisma.payment.create({
       data: {
-        iOweMoneyId: id,
+        iOweMoney: { connect: { id } },
         amount: parseFloat(amount),
+        type,
         date: date ? new Date(date) : new Date(),
         description,
       },
@@ -179,15 +193,23 @@ async function handleRecordPayment(req, res, id) {
       },
     });
 
-    // Calculate totalPaid and remaining
-    const totalPaid = updatedEntry.payments.reduce((sum, p) => sum + p.amount, 0);
-    const remaining = updatedEntry.amount - totalPaid;
+    // Calculate totalPaid and totalAdditionalDebt
+    const totalPaid = updatedEntry.payments
+      .filter(p => p.type === 'payment')
+      .reduce((sum, p) => sum + p.amount, 0);
+    
+    const totalAdditionalDebt = updatedEntry.payments
+      .filter(p => p.type === 'additional_debt')
+      .reduce((sum, p) => sum + p.amount, 0);
+    
+    const remaining = updatedEntry.amount + totalAdditionalDebt - totalPaid;
 
-    return sendResponse(res, 201, true, 'Payment recorded successfully', {
+    return sendResponse(res, 201, true, 'Transaction recorded successfully', {
       payment,
       entry: {
         ...updatedEntry,
         totalPaid,
+        totalAdditionalDebt,
         remaining,
       },
     });
