@@ -2,8 +2,9 @@ import bcryptjs from 'bcryptjs';
 import { prisma } from '../../../lib/prisma';
 import { generateToken } from '../../../lib/utils/jwt';
 import { sendResponse, sendError } from '../../../lib/utils/response';
+import { withCORS } from '../../../lib/middleware/cors';
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method === 'POST') {
     return handleSignup(req, res);
   }
@@ -11,6 +12,8 @@ export default async function handler(req, res) {
   res.setHeader('Allow', ['POST']);
   return sendError(res, 405, `Method ${req.method} Not Allowed`);
 }
+
+export default withCORS(handler);
 
 async function handleSignup(req, res) {
   try {

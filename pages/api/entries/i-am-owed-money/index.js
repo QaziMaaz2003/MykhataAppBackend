@@ -1,6 +1,7 @@
-import { prisma } from '../../../lib/prisma';
-import { withAuth } from '../../../lib/middleware/auth';
-import { sendResponse, sendError } from '../../../lib/utils/response';
+import { prisma } from '../../../../lib/prisma';
+import { withAuth } from '../../../../lib/middleware/auth';
+import { withCORS } from '../../../../lib/middleware/cors';
+import { sendResponse, sendError } from '../../../../lib/utils/response';
 
 async function handler(req, res) {
   if (req.method === 'GET') {
@@ -66,4 +67,4 @@ async function handleCreateEntry(req, res) {
   }
 }
 
-export default withAuth(handler);
+export default withCORS(withAuth(handler));

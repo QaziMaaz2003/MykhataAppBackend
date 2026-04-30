@@ -2,8 +2,9 @@ import bcryptjs from 'bcryptjs';
 import { prisma } from '../../../lib/prisma';
 import { generateToken } from '../../../lib/utils/jwt';
 import { sendResponse, sendError } from '../../../lib/utils/response';
+import { withCORS } from '../../../lib/middleware/cors';
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method === 'POST') {
     return handleLogin(req, res);
   }
@@ -11,6 +12,8 @@ export default async function handler(req, res) {
   res.setHeader('Allow', ['POST']);
   return sendError(res, 405, `Method ${req.method} Not Allowed`);
 }
+
+export default withCORS(handler);
 
 async function handleLogin(req, res) {
   try {
@@ -27,19 +30,19 @@ async function handleLogin(req, res) {
     });
 
     if (!user) {
-      return sendError(res, 401, 'Invalid email or password');
+      return sendError(res, 400, 'Invalid email or password');
     }
 
     // Check if user is active
     if (!user.isActive) {
-      return sendError(res, 401, 'Account is deactivated');
+      return sendError(res, 400, 'Account is deactivated');
     }
 
     // Compare passwords
     const passwordMatch = await bcryptjs.compare(password, user.password);
 
     if (!passwordMatch) {
-      return sendError(res, 401, 'Invalid email or password');
+      return sendError(res, 400, 'Invalid email or password');
     }
 
     // Generate token

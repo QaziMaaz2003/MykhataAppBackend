@@ -1,5 +1,6 @@
 import { prisma } from '../../../../lib/prisma';
 import { withAuth } from '../../../../lib/middleware/auth';
+import { withCORS } from '../../../../lib/middleware/cors';
 import { sendResponse, sendError } from '../../../../lib/utils/response';
 
 async function handler(req, res) {
@@ -64,7 +65,7 @@ async function handleUpdateEntry(req, res, id) {
         ...(date && { date: new Date(date) }),
         ...(dueDate && { dueDate: new Date(dueDate) }),
         ...(phoneNumber && { phoneNumber }),
-        ...(billImageUrl && { billImageUrl }),
+        ...(billImageUrl !== undefined && { billImageUrl: billImageUrl || null }),
         ...(description && { description }),
         ...(status && { status }),
       },
@@ -102,4 +103,4 @@ async function handleDeleteEntry(req, res, id) {
   }
 }
 
-export default withAuth(handler);
+export default withCORS(withAuth(handler));
