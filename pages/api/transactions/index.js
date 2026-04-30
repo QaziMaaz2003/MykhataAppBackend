@@ -1,57 +1,33 @@
-import { connectDB } from '../../lib/db.js';
-import Transaction from '../../lib/models/Transaction.js';
-import { sendResponse, sendError } from '../../lib/utils/response.js';
+// Transactions endpoints moved to /api/entries
+// This is kept for backward compatibility only
 
 export default async function handler(req, res) {
-  await connectDB();
-
   const { method } = req;
-
+  res.setHeader('Content-Type', 'application/json');
+  
   try {
-    switch (method) {
-      case 'GET':
-        return handleGetTransactions(req, res);
-      case 'POST':
-        return handleCreateTransaction(req, res);
-      default:
-        res.setHeader('Allow', ['GET', 'POST']);
-        return sendError(res, 405, `Method ${method} Not Allowed`);
+    if (method === 'GET' || method === 'POST') {
+      return res.status(200).json({
+        success: true,
+        message: 'Transactions endpoint - use /api/entries instead',
+        data: method === 'GET' ? [] : {},
+        timestamp: new Date().toISOString(),
+      });
     }
+
+    res.setHeader('Allow', ['GET', 'POST']);
+    return res.status(405).json({
+      success: false,
+      message: `Method ${method} Not Allowed`,
+      timestamp: new Date().toISOString(),
+    });
   } catch (error) {
     console.error('Error:', error);
-    return sendError(res, 500, 'Internal Server Error', error.message);
-  }
-}
-
-async function handleGetTransactions(req, res) {
-  try {
-    const transactions = await Transaction.find().populate('userId', 'name email');
-    return sendResponse(res, 200, true, 'Transactions retrieved', transactions);
-  } catch (error) {
-    return sendError(res, 500, 'Failed to retrieve transactions', error.message);
-  }
-}
-
-async function handleCreateTransaction(req, res) {
-  try {
-    const { userId, type, amount, description, category, date } = req.body;
-
-    if (!userId || !type || !amount) {
-      return sendError(res, 400, 'Missing required fields');
-    }
-
-    const transaction = new Transaction({
-      userId,
-      type,
-      amount,
-      description,
-      category,
-      date,
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+      error: error.message,
+      timestamp: new Date().toISOString(),
     });
-
-    await transaction.save();
-    return sendResponse(res, 201, true, 'Transaction created', transaction);
-  } catch (error) {
-    return sendError(res, 400, 'Failed to create transaction', error.message);
   }
 }

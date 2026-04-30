@@ -1,9 +1,1 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/api/entries/i-am-owed-money": "pages/api/entries/i-am-owed-money.js",
-  "/api/entries/i-owe-money": "pages/api/entries/i-owe-money.js",
-  "/api/auth/login": "pages/api/auth/login.js",
-  "/api/entries/i-am-owed-money/[id]": "pages/api/entries/i-am-owed-money/[id].js"
-}
+{"/_app":"pages/_app.js","/_error":"pages/_error.js","/api/auth/login":"pages/api/auth/login.js","/api/auth/register":"pages/api/auth/register.js","/api/auth/resend-otp":"pages/api/auth/resend-otp.js","/api/auth/verify-login-otp":"pages/api/auth/verify-login-otp.js","/api/auth/verify-signup-otp":"pages/api/auth/verify-signup-otp.js","/api/delete-image":"pages/api/delete-image.js","/api/entries/i-am-owed-money":"pages/api/entries/i-am-owed-money.js","/api/entries/i-am-owed-money/[id]":"pages/api/entries/i-am-owed-money/[id].js","/api/entries/i-owe-money/[id]":"pages/api/entries/i-owe-money/[id].js","/api/entries/i-owe-money":"pages/api/entries/i-owe-money.js","/api/health":"pages/api/health.js","/api":"pages/api.js","/api/profile":"pages/api/profile.js","/api/transactions/[id]":"pages/api/transactions/[id].js","/api/transactions":"pages/api/transactions.js","/api/upload":"pages/api/upload.js","/_document":"pages/_document.js","/404":"pages/404.html"}
