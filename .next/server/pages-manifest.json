@@ -1,7 +1,0 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/api/entries/i-am-owed-money": "pages/api/entries/i-am-owed-money.js",
-  "/api/entries/i-owe-money": "pages/api/entries/i-owe-money.js"
-}
