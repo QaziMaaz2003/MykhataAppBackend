@@ -3,8 +3,5 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/api/entries/i-am-owed-money/[id]": "pages/api/entries/i-am-owed-money/[id].js",
-  "/api/entries/i-am-owed-money": "pages/api/entries/i-am-owed-money.js",
-  "/api/upload": "pages/api/upload.js",
-  "/api/entries/i-owe-money": "pages/api/entries/i-owe-money.js",
-  "/api/delete-image": "pages/api/delete-image.js"
+  "/api/entries/i-am-owed-money": "pages/api/entries/i-am-owed-money.js"
 }
