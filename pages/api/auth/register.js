@@ -1,16 +1,38 @@
 import bcryptjs from 'bcryptjs';
 import { prisma } from '../../../lib/prisma';
-import { generateToken } from '../../../lib/utils/jwt';
 import { sendResponse, sendError } from '../../../lib/utils/response';
+import { withCORS } from '../../../lib/middleware/cors';
+import { generateToken } from '../../../lib/utils/jwt';
 
-export default async function handler(req, res) {
+const validatePasswordStrength = (password) => {
+  if (password.length < 8) return 'Password must be at least 8 characters';
+  if (!/[A-Z]/.test(password)) return 'Password must contain at least one uppercase letter';
+  if (!/[a-z]/.test(password)) return 'Password must contain at least one lowercase letter';
+  if (!/\d/.test(password)) return 'Password must contain at least one number';
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    return 'Password must contain at least one special character';
+  }
+  return null;
+};
+
+const validatePhoneNumber = (phone) => {
+  if (!phone) return null;
+  const digitsOnly = phone.replace(/\D/g, '');
+  if (digitsOnly.length !== 11) return 'Phone number must be exactly 11 digits';
+  return null;
+};
+
+async function handler(req, res) {
   if (req.method === 'POST') {
-    return handleSignup(req, res);
+    await handleSignup(req, res);
+    return;
   }
 
   res.setHeader('Allow', ['POST']);
-  return sendError(res, 405, `Method ${req.method} Not Allowed`);
+  sendError(res, 405, `Method ${req.method} Not Allowed`);
 }
+
+export default withCORS(handler);
 
 async function handleSignup(req, res) {
   try {
@@ -21,8 +43,16 @@ async function handleSignup(req, res) {
       return sendError(res, 400, 'Name, email, and password are required');
     }
 
-    if (password.length < 6) {
-      return sendError(res, 400, 'Password must be at least 6 characters');
+    // Validate password strength
+    const passwordError = validatePasswordStrength(password);
+    if (passwordError) {
+      return sendError(res, 400, passwordError);
+    }
+
+    // Validate phone number if provided
+    const phoneError = validatePhoneNumber(phone);
+    if (phoneError) {
+      return sendError(res, 400, phoneError);
     }
 
     // Check if user already exists
@@ -44,23 +74,26 @@ async function handleSignup(req, res) {
         email,
         password: hashedPassword,
         gender,
-        phone,
         dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+        phone,
       },
     });
 
-    // Generate token
     const token = generateToken(user.id);
 
-    // Return user data (without password)
-    const { password: _, ...userWithoutPassword } = user;
-
-    return sendResponse(res, 201, true, 'User registered successfully', {
-      user: userWithoutPassword,
+    return sendResponse(res, 201, true, 'Account created successfully', {
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        gender: user.gender,
+        dateOfBirth: user.dateOfBirth,
+        phone: user.phone,
+      },
       token,
     });
   } catch (error) {
     console.error('Signup error:', error);
-    return sendError(res, 500, 'Failed to create user', error.message);
+    return sendError(res, 500, 'Registration failed', error.message);
   }
 }

@@ -1,6 +1,7 @@
-import { prisma } from '../../../lib/prisma';
-import { withAuth } from '../../../lib/middleware/auth';
-import { sendResponse, sendError } from '../../../lib/utils/response';
+import { prisma } from '../../../../lib/prisma';
+import { withAuth } from '../../../../lib/middleware/auth';
+import { withCORS } from '../../../../lib/middleware/cors';
+import { sendResponse, sendError } from '../../../../lib/utils/response';
 
 async function handler(req, res) {
   if (req.method === 'GET') {
@@ -20,15 +21,34 @@ async function handleGetEntries(req, res) {
       where: {
         userId: req.userId,
       },
+      include: {
+        payments: {
+          orderBy: {
+            date: 'asc',
+          },
+        },
+      },
       orderBy: {
         createdAt: 'desc',
       },
     });
 
-    const total = entries.reduce((sum, entry) => sum + entry.amount, 0);
+    // Calculate totalPaid and remaining for each entry
+    const entriesWithCalculations = entries.map((entry) => {
+      const totalPaid = entry.payments.reduce((sum, payment) => sum + payment.amount, 0);
+      const remaining = entry.amount - totalPaid;
+      return {
+        ...entry,
+        totalPaid,
+        remaining,
+      };
+    });
+
+    // Calculate total remaining amount across all entries
+    const total = entriesWithCalculations.reduce((sum, entry) => sum + entry.remaining, 0);
 
     return sendResponse(res, 200, true, 'Entries retrieved', {
-      entries,
+      entries: entriesWithCalculations,
       total,
       count: entries.length,
     });
@@ -66,4 +86,4 @@ async function handleCreateEntry(req, res) {
   }
 }
 
-export default withAuth(handler);
+export default withCORS(withAuth(handler));

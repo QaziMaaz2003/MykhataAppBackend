@@ -1,4 +1,4 @@
-import { sendResponse } from '../utils/response.js';
+import { sendResponse } from '../../lib/utils/response';
 
 export default function handler(req, res) {
   if (req.method === 'GET') {

@@ -24,8 +24,25 @@ model User {
 
   iOweMoney     IOweMoney[]
   iAmOwedMoney  IAmOwedMoney[]
+  otps          OTP[]
 
   @@map("users")
+}
+
+model OTP {
+  id            String     @id @default(cuid())
+  email         String
+  otp           String
+  type          String     @default("email_verification") // email_verification, password_reset
+  isUsed        Boolean    @default(false)
+  userId        String?
+  user          User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt     DateTime
+  createdAt     DateTime   @default(now())
+
+  @@index([email])
+  @@index([userId])
+  @@map("otps")
 }
 
 model IOweMoney {
@@ -34,13 +51,15 @@ model IOweMoney {
   user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   personName    String
-  amount        Float
+  amount        Float      // Original amount owed (immutable)
   date          DateTime
   dueDate       DateTime?
   phoneNumber   String?
   billImageUrl  String?
   description   String?
   status        String     @default("pending") // pending, completed
+  
+  payments      Payment[]  @relation("IOweMoneyPayments")
   
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
@@ -55,7 +74,7 @@ model IAmOwedMoney {
   user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   personName    String
-  amount        Float
+  amount        Float      // Original amount owed (immutable)
   date          DateTime
   dueDate       DateTime?
   phoneNumber   String?
@@ -63,9 +82,34 @@ model IAmOwedMoney {
   description   String?
   status        String     @default("pending") // pending, completed
   
+  payments      Payment[]  @relation("IAmOwedMoneyPayments")
+  
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
   @@index([userId])
   @@map("i_am_owed_money")
+}
+
+model Payment {
+  id                  String     @id @default(cuid())
+  
+  // Relations
+  iOweMoneyId         String?
+  iOweMoney           IOweMoney? @relation("IOweMoneyPayments", fields: [iOweMoneyId], references: [id], onDelete: Cascade)
+  
+  iAmOwedMoneyId      String?
+  iAmOwedMoney        IAmOwedMoney? @relation("IAmOwedMoneyPayments", fields: [iAmOwedMoneyId], references: [id], onDelete: Cascade)
+  
+  // Payment details
+  amount              Float
+  date                DateTime   @default(now())
+  description         String?
+  
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  @@index([iOweMoneyId])
+  @@index([iAmOwedMoneyId])
+  @@map("payments")
 }
