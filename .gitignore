@@ -8,6 +8,7 @@ yarn-debug.log*
 yarn-error.log*
 dist/
 build/
+.next/
 .vscode/
 .idea/
 *.swp
