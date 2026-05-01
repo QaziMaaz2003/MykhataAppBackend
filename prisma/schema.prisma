@@ -103,6 +103,7 @@ model Payment {
   
   // Payment details
   amount              Float
+  type                String     @default("payment") // "payment" (money returned/paid), "additional_debt" (more money taken/owed)
   date                DateTime   @default(now())
   description         String?
   
