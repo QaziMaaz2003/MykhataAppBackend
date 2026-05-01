@@ -167,7 +167,7 @@ async function handleRecordPayment(req, res, id) {
       return sendError(res, 403, 'Not authorized to record payment for this entry');
     }
 
-    const { amount, date, description, type = 'payment' } = req.body;
+    const { amount, date, description, type = 'payment', imageUrl } = req.body;
 
     if (!amount || amount <= 0) {
       return sendError(res, 400, 'Payment amount must be a positive number');
@@ -186,6 +186,7 @@ async function handleRecordPayment(req, res, id) {
         type,
         date: date ? new Date(date) : new Date(),
         description,
+        ...(imageUrl && { imageUrl }),
       },
     });
 
